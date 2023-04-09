@@ -1,0 +1,112 @@
+<iframe th:src="@{'https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d43825.86886054671!2d' + ${contacts.get(0).getY()} + '!3d' + ${contacts.get(0).getX()} + '!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNTDCsDI2JzM0LjMiTiAzMMKwMjknMzUuMCJF!5e0!3m2!1suk!2sua!4v1679604811208!5m2!1suk!2sua&zoom=15'}"
+                    width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+
+            <!DOCTYPE html>
+            <html lang="uk">
+
+            <head>
+                <meta charset="UTF-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+            </head>
+
+            <body>
+            <header th:insert="blocks/header :: header"></header>
+
+            <table style="width:100%">
+                <tr>
+                    <td style="width:80%">
+
+                    </td>
+                    <td style="width:20%">
+                        <div th:each="ads : ${ads}">
+                            <img th:src="${'data:image/jpeg;base64,' + ads.getImage()}" style="width: 80%; height: auto; margin-top: 25px;" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <footer th:insert="blocks/footer :: footer"></footer>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+            </body>
+
+....................................................................
+Загрузити HTML-повідомлення
+                                <button type="button" onclick="document.getElementById('fileInput').click()" class="btn btn-secondary">Завантажити HTML-файл</button>
+                                <input id="fileInput" type="file"  style="display:none;" name="message" accept=".html"></br>
+                                <div style="display: inline-block;">Вибраний файл:</div>
+                                <a id="downloadLink" href="#" style="display:none; margin-left: 10%; display: inline-block;">Скачати HTML-файл</a>
+
+                                <script>
+                                    document.getElementById('fileInput').addEventListener('change', function() {
+                                        var file = this.files[0];
+                                        var formData = new FormData();
+                                        formData.append('htmlFile', file);
+                                        var downloadLink = document.getElementById('downloadLink');
+                                        downloadLink.setAttribute('href', URL.createObjectURL(file));
+                                        downloadLink.setAttribute('download', file.name);
+                                        downloadLink.style.display = 'block';
+                                    });
+                                </script>
+                                <br/>
+                                <br/>
+                                Кількість листів:
+
+                                <br/>
+                                <br/>
+                                Розсилка виконана на:
+
+
+.......................................
+@Service
+public class UserService implements UserDetailsService {
+
+    private UsersService usersService;
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Users user = usersService.getByEmail(email);
+        if (user == null) {
+            user = new Users();
+            user.setEmail(email);
+            usersService.save(user);
+        }
+
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toList());
+
+        // встановлюємо невідомий пароль
+        String password = "N/A";
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                password,
+                authorities);
+    }
+}
+
+..........................................
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityCoxnfigurerAdapter {
+
+    private UserDetailsService userDetailsService;
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .antMatchers("/user/**").hasRole("USER")
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .and()
+                .formLogin();
+    }
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService);
+    }
+}

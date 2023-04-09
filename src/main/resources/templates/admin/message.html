@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <title>message</title>
+</head>
+
+<body>
+<table style="width:100%">
+    <tr>
+        <td style="width:10%; vertical-align: top">
+            <headerAdmin th:insert="blocks/headerAdmin :: headerAdmin"></headerAdmin>
+        </td>
+        <td class="vertical-line" style="width:5%"></td>
+        <td style="width:85%">
+
+            <h3>E-main</h3>
+            <h5>
+                Виберіть email кому відправлять
+                <input type="radio" id="gender1" name="people" value="all" style="margin-left: 10%;">
+                <label for="gender1">Всім</label>
+                <input type="radio" id="gender2" name="people" value="people" style="margin-left: 10%;">
+                <label for="gender2">Виборочно</label>
+                <button type="button" class="btn btn-secondary" style="margin-left: 5px; margin-left: 10%">
+                    <a href="/admin/message/users/" style="color: inherit; text-decoration: none;;">Вибрати</a>
+                </button>
+                <br/>
+                <table style="width: 85%; margin-top: 15px;">
+                    <tr>
+                        <td style="width: 65%;">
+                            <form method="post" action="/admin/message/send/" enctype="multipart/form-data">
+                                <button type="button" onclick="document.getElementById('fileInput').click()"
+                                        class="btn btn-secondary">Завантажити HTML-файл
+                                </button>
+                                <input id="fileInput" type="file" style="display:none;" name="message"
+                                       accept=".html"></br>
+                                <div style="display: inline-block;">Вибраний файл:</div>
+                                <a id="downloadLink" href="#"
+                                   style="display:none; margin-left: 10%; display: inline-block;">Скачати HTML-файл</a>
+
+                                <script>
+                                    document.getElementById('fileInput').addEventListener('change', function () {
+                                        var file = this.files[0];
+                                        var formData = new FormData();
+                                        formData.append('htmlFile', file);
+                                        var downloadLink = document.getElementById('downloadLink');
+                                        downloadLink.setAttribute('href', URL.createObjectURL(file));
+                                        downloadLink.setAttribute('download', file.name);
+                                        downloadLink.style.display = 'block';
+                                    });
+                                </script>
+                                <center>
+                                    <br/>
+                                    <h4 style="margin-top: 50px">Кількість листів: [[${number_users}]]</h4>
+                                    <input type="hidden" name="users_id" th:value="${users_id}"/>
+                                    <button class="btn-secondary btn" type="submit"><h3>Почати розсилку</h3></button>
+                                </center>
+                            </form>
+                        </td>
+                        <td style="width: 35%; border: 2px solid black">
+                            <center>
+                                <h7>Список останіх загружених повідомлень</h7>
+                            </center>
+                            <div th:each="email:${last_three}">
+                                <form th:action="${'/admin/message/send/'+email.id}" enctype="multipart/form-data">
+                                    <input type="hidden" name="users_id" th:value="${users_id}"/>
+                                    <button type="submit" class="btn btn-secondary" style="margin-top: 15px"><a
+                                            th:href="${'/admin/message/send/'+email.id}" th:text="${email.subject}"
+                                            style="color: white; text-decoration: none;"/></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </h5>
+        </td>
+    </tr>
+</table>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

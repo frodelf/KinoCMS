@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <title>admin</title>
+</head>
+
+<body>
+<table style="width:100%">
+    <tr>
+        <td style="width:10%; vertical-align: top;">
+            <headerAdmin th:insert="blocks/headerAdmin :: headerAdmin"></headerAdmin>
+        </td>
+        <td class="border-right border-dark h-100" style="width:5%;"></td>
+        <td style="width:85%; vertical-align: top">
+                <table width="90%">
+                    <div th:each="contacts : ${contacts}">
+                        <form method="post" th:action="@{/admin/pages/contacts/edit/{id}/(id=${contacts.id})}" enctype="multipart/form-data">
+                        <tr>
+                            <td style="border: 2px solid black; width: 90%">
+                                Назва кінотеатру:
+                                <input class="form-control" type="text" name="name" placeholder="text"
+                                       style="display: inline-block; margin-top: 15px; width: 40%;"
+                                       th:value="${contacts.getName()}"><br/>
+                                Адресс:
+                                <textarea class="form-control" name="address" rows="10" cols="50"
+                                          style="width: 60%; height: 100px">[[${contacts.getAddress}]]</textarea><br/>
+                                Координати: x=
+                                <input class="form-control" type="text" name="x" placeholder="text"
+                                       style="display: inline-block; margin-top: 15px; width: 20%; margin-right: 15px"
+                                       th:value="${contacts.getX()}">
+                                y= <input class="form-control" type="text" name="y" placeholder="text"
+                                          style="display: inline-block; margin-top: 15px; width: 20%;"
+                                          th:value="${contacts.getY()}"><br/>
+
+                                Лого:
+                                <button type="button" class="btn btn-secondary" style="margin-left: 30px">
+                                    <label th:for="'fileInput-'+${contacts.id}" style="cursor: pointer;">
+                                        <i class="fa fa-file-image-o" aria-hidden="true"></i> Додати фото
+                                    </label>
+                                </button>
+                                <input th:id="'fileInput-'+${contacts.id}" type="file" style="display:none;" name="image">
+                                <img th:id="'selectedImage-'+${contacts.id}" src="" alt="Вибране зображення" style="width: 150px; height: 90px; margin-top: 15px">
+
+                                <script>
+                                    document.querySelector('#fileInput-'+[[${contacts.id}]]).addEventListener('change', (event) => {
+                                        const file = event.target.files[0];
+                                        const reader = new FileReader();
+                                        reader.onload = () => {
+                                            document.querySelector('#selectedImage-'+[[${contacts.id}]]).setAttribute('src', reader.result);
+                                        };
+                                        reader.readAsDataURL(file);
+                                    });
+                                </script>
+
+                                <center>
+                                    <button type="submit" class="btn btn-secondary btn-sm"
+                                            style="margin-top: 10px;margin-left: 25px"><h2>Зберегти</h2></button>
+                                    <a class="btn btn-secondary"
+                                       th:href="'/admin/pages/contacts/delete/'+${contacts.id}"
+                                       style="margin-left: 10px">
+                                        <img src="/images/delete.png" style="width: 40%;"></a>
+                                </center>
+                            </td>
+                        </tr>
+                        </form>
+                    </div>
+                </table>
+            <center>
+                <button type="button" class="btn btn-secondary btn-sm"
+                        onclick="window.location.href = '/admin/pages/contacts/add/'"
+                        style="margin-top: 30px;margin-left: 25px"><h2>Додати контакт</h2></button>
+            </center>
+
+                <form method="post" th:action="@{/admin/pages/contacts/save/{id}/seo-block/(id=${main.id})}">
+                    URL: <input class="form-control" type="text" name="url" placeholder="url"
+                                style="display: inline-block; margin-top: 15px; width: 40%;" th:value="${main.getSeoBlock().getUrl()}"><br/>
+                    Title: <input class="form-control" type="text" name="title" placeholder="title"
+                                  style="display: inline-block; margin-top: 15px; width: 40%;" th:value="${main.getSeoBlock().getTitle()}"><br/>
+                    keywords: <input class="form-control" type="text" name="keywords" placeholder="keywords"
+                                     style="display: inline-block; margin-top: 15px; width: 40%;" th:value="${main.getSeoBlock().getKeywords()}"><br/>
+                    <p style="margin-top: 15px;">Description: <textarea class="form-control" name="depiction" rows="10" cols="50" style="width: 60%; height: 100px">[[${main.getSeoBlock().getDepiction()}]]</textarea>
+                        <br>
+                    </p>
+                    <center>
+                        <button type="submit" class="btn btn-secondary"
+                                style="margin-top: 10px;margin-left: 25px"><h2>Зберегти</h2>
+                        </button>
+                    </center>
+                </form>
+
+
+
+        </td>
+    </tr>
+</table>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
